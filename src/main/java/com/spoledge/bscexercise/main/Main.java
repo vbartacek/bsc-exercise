@@ -1,4 +1,4 @@
-package com.spoledge.bscexercise;
+package com.spoledge.bscexercise.main;
 
 /**
  * The entry point of the application.
