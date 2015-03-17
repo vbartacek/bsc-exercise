@@ -71,7 +71,9 @@ public class SimplePaymentReporterImpl extends AbstractPaymentReporterImpl {
         sb.append( NL );
 
         for (Money money : sortByCurrencyCode( balance.getAllMoney())) {
-            sb.append( money ).append( NL );
+            if (!money.isZero()) {
+                sb.append( money ).append( NL );
+            }
         }
 
         sb.append( "---------------------------" );
@@ -82,6 +84,7 @@ public class SimplePaymentReporterImpl extends AbstractPaymentReporterImpl {
 
         log.info( "Generating report:" + report );
 
+        // we print it at once, so underlying synchronization avoid mixing report messages together:
         out.print( report );
         out.flush();
     }
