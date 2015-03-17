@@ -1,7 +1,6 @@
 package com.spoledge.bscexercise.impl;
 
 import java.math.BigDecimal;
-import java.util.Currency;
 import java.util.List;
 
 import org.junit.Before;
@@ -9,6 +8,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import com.spoledge.bscexercise.model.Balance;
+import com.spoledge.bscexercise.model.Curr;
 import com.spoledge.bscexercise.model.Money;
 
 import static com.spoledge.bscexercise.TestUtils.*;
@@ -105,12 +105,12 @@ public class MemoryPaymentProcessorTest {
     // Private
     ////////////////////////////////////////////////////////////////////////////
 
-    private BigDecimal ofCurrencyAmount( List<Money> list, Currency curr ) {
+    private BigDecimal ofCurrencyAmount( List<Money> list, Curr curr ) {
         return ofCurrency( list, curr ).getAmount();
     }
 
 
-    private Money ofCurrency( List<Money> list, Currency curr ) {
+    private Money ofCurrency( List<Money> list, Curr curr ) {
         for (Money money : list) {
             if (curr == money.getCurrency()) return money;
         }

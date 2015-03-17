@@ -91,7 +91,7 @@
 						<exclude>**/Abstract*.java</exclude>
 					</excludes>
 					<systemPropertyVariables>
-						<testOtherDir>${rootDir}/examples/other</testOtherDir>
+						<testSampleDir>${basedir}/src/test/samples</testSampleDir>
 					</systemPropertyVariables>
 				</configuration>
 			</plugin>

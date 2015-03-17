@@ -1,12 +1,12 @@
 package com.spoledge.bscexercise.impl;
 
 import java.util.ArrayList;
-import java.util.Currency;
 import java.util.HashMap;
 
 import com.spoledge.bscexercise.PaymentProcessor;
 
 import com.spoledge.bscexercise.model.Balance;
+import com.spoledge.bscexercise.model.Curr;
 import com.spoledge.bscexercise.model.Money;
 
 
@@ -16,7 +16,7 @@ import com.spoledge.bscexercise.model.Money;
  */
 public class MemoryPaymentProcessorImpl implements PaymentProcessor {
 
-    private HashMap<Currency, Money> allCurrenciesMap = new HashMap<Currency, Money>();
+    private HashMap<Curr, Money> allCurrenciesMap = new HashMap<Curr, Money>();
     private int lastTransationId;
 
 
@@ -55,7 +55,7 @@ public class MemoryPaymentProcessorImpl implements PaymentProcessor {
     public synchronized int registerPayment( Money payment ) {
         if (payment == null) throw new NullPointerException( "Missing payment" );
 
-        Currency currency = payment.getCurrency();
+        Curr currency = payment.getCurrency();
         Money balance = allCurrenciesMap.get( currency );
 
         // NOTE: we keep the balance even if it is zero,

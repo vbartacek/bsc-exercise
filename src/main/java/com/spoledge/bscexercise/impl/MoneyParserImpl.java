@@ -1,11 +1,11 @@
 package com.spoledge.bscexercise.impl;
 
 import java.math.BigDecimal;
-import java.util.Currency;
 
 import com.spoledge.bscexercise.MoneyParseException;
 import com.spoledge.bscexercise.MoneyParser;
 
+import com.spoledge.bscexercise.model.Curr;
 import com.spoledge.bscexercise.model.Money;
 
 
@@ -64,13 +64,26 @@ public class MoneyParserImpl implements MoneyParser {
      * @throws NullPointerException when the parameter is null
      */
     public Money parseMoney( String line ) throws MoneyParseException {
+        return parseMoney( line, -1 );
+    }
+
+
+    /**
+     * Parses money string line.
+     * @param line the string line containing both currency and amount
+     * @param lineNumber the line number or -1 if not applicable
+     * @return the parsed money - always non-null
+     * @throws MoneyParseException when the money cannot be parsed
+     * @throws NullPointerException when the parameter is null
+     */
+    public Money parseMoney( String line, int lineNumber ) throws MoneyParseException {
         if (line == null) throw new NullPointerException( "Missing line parameter" );
 
         int n = line.indexOf( ' ' );
 
-        if (n == -1) throw new MoneyParseException( "Invalid line format" );
+        if (n == -1) throw new MoneyParseException( "Invalid line format", lineNumber );
 
-        return parseMoney( line.substring( 0, n ), line.substring( n ));
+        return parseMoney0( line.substring( 0, n ), line.substring( n ), lineNumber );
     }
 
 
@@ -86,27 +99,7 @@ public class MoneyParserImpl implements MoneyParser {
         if (currency == null) throw new NullPointerException( "Missing currency parameter" );
         if (amount == null) throw new NullPointerException( "Missing amount parameter" );
 
-        currency = currency.trim();
-        amount = amount.trim();
-
-        Currency curr = null;
-
-        try {
-            curr = Currency.getInstance( currency );
-        }
-        catch (IllegalArgumentException e) {
-            throw new MoneyParseException( "Invalid currency code '" + currency + "'" );
-        }
-
-        String canonizedAmount = canonizeDecimalPoints( amount );
-        BigDecimal bd = null;
-
-        try {
-            return new Money( curr, new BigDecimal( canonizedAmount ));
-        }
-        catch (NumberFormatException e) {
-            throw new MoneyParseException( "Invalid amount '" + amount + "'" );
-        }
+        return parseMoney0( currency, amount, -1 );
     }
 
 
@@ -134,6 +127,31 @@ public class MoneyParserImpl implements MoneyParser {
     // Private
     ////////////////////////////////////////////////////////////////////////////
 
+    private Money parseMoney0( String currency, String amount, int lineNumber ) throws MoneyParseException {
+        currency = currency.trim();
+        amount = amount.trim();
+
+        Curr curr = null;
+
+        try {
+            curr = Curr.getInstance( currency );
+        }
+        catch (IllegalArgumentException e) {
+            throw new MoneyParseException( "Invalid currency code '" + currency + "'", lineNumber );
+        }
+
+        String canonizedAmount = canonizeDecimalPoints( amount, lineNumber );
+        BigDecimal bd = null;
+
+        try {
+            return new Money( curr, new BigDecimal( canonizedAmount ));
+        }
+        catch (NumberFormatException e) {
+            throw new MoneyParseException( "Invalid amount '" + amount + "'", lineNumber );
+        }
+    }
+
+
     /**
      * Canonize decimal points.
      * If the value has less decimal points, then additional ones are added.
@@ -142,7 +160,7 @@ public class MoneyParserImpl implements MoneyParser {
      * @return the canonized value
      * @throws MoneyParseException if too many decimal points are found
      */
-    String canonizeDecimalPoints( String amount ) throws MoneyParseException {
+    String canonizeDecimalPoints( String amount, int lineNumber ) throws MoneyParseException {
         // avoid numbers starting with decimal point only:
         if (amount.charAt( 0 ) == '.') {
             // let the BigDecimal parser to cope with this:
@@ -188,7 +206,7 @@ public class MoneyParserImpl implements MoneyParser {
             return amount + (hasDp ? "" : ".") + ZEROS.substring( 0, decimalPoints - dp );
         }
 
-        throw new MoneyParseException( "Too many decimal points: " + amount );
+        throw new MoneyParseException( "Too many decimal points: " + amount, lineNumber );
     }
 
 }

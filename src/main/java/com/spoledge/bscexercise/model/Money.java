@@ -1,7 +1,6 @@
 package com.spoledge.bscexercise.model;
 
 import java.math.BigDecimal;
-import java.util.Currency;
 
 
 /**
@@ -14,7 +13,7 @@ public final class Money {
     // Attributes
     ////////////////////////////////////////////////////////////////////////////
 
-    private Currency currency;
+    private Curr currency;
     private BigDecimal amount;
 
 
@@ -28,7 +27,7 @@ public final class Money {
      * @param amount the amount
      * @throws NullPointerException if any of the parameters is null
      */
-    public Money( Currency currency, BigDecimal amount ) {
+    public Money( Curr currency, BigDecimal amount ) {
         if (currency == null) throw new NullPointerException( "Missing currency" );
         if (amount == null) throw new NullPointerException( "Missing amount" );
         
@@ -44,7 +43,7 @@ public final class Money {
     /**
      * Returns the currency.
      */
-    public Currency getCurrency() {
+    public Curr getCurrency() {
         return currency;
     }
 
@@ -67,7 +66,7 @@ public final class Money {
     public Money add( Money other ) {
         if (other == null) throw new NullPointerException( "Missing other money" );
 
-        // we do not use equals() because (javadoc of java.util.Currency):
+        // we do not use equals() because (javadoc of java.util.Currency / Curr):
         // "The class is designed so that there's never more
         // than one Currency instance for any given currency"
         if (this.currency != other.currency) throw new IllegalArgumentException( "Currency mismatch" );

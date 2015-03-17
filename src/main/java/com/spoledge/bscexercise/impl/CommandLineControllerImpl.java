@@ -1,10 +1,13 @@
 package com.spoledge.bscexercise.impl;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
+
+import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,6 +19,7 @@ import com.spoledge.bscexercise.PaymentProcessor;
 import com.spoledge.bscexercise.PaymentReporter;
 
 import com.spoledge.bscexercise.model.Money;
+import com.spoledge.bscexercise.util.MoneyFile;
 
 
 /**
@@ -151,6 +155,34 @@ public class CommandLineControllerImpl implements Runnable, Controller {
     }
 
 
+    /**
+     * Loads a file.
+     */
+    public void loadFile( File file ) throws IOException, MoneyParseException {
+        MoneyFile mf = new MoneyFile( moneyParser, file );
+        println( "Loading file " + file + "..." );
+        int count = 0;
+
+        try {
+            mf.validate();
+
+            for (Iterator<Money> iter = mf.fetch(); iter.hasNext();) {
+                paymentProcessor.registerPayment( iter.next());
+                count++;
+            }
+
+            println( "File " + file + " successfully loaded (" + count + " lines)." );
+        }
+        catch (Exception e) {
+            log.error( "Cannot load file '" + file + "'", e);
+            println( "ERROR Loading file " + file + ", aborting: " + e );
+        }
+        finally {
+            mf.close();
+        }
+    }
+
+
     ////////////////////////////////////////////////////////////////////////////
     // Public
     ////////////////////////////////////////////////////////////////////////////
@@ -197,6 +229,7 @@ public class CommandLineControllerImpl implements Runnable, Controller {
 
         if ( "quit".equals( cmd )) processCmdQuit( args );
         else if ( "report".equals( cmd )) processCmdReport( args );
+        else if ( "file".equals( cmd )) processCmdFile( args );
         else if ( "help".equals( cmd )) processCmdHelp( args );
         else if ( args.length == 2 ) {
             try {
@@ -251,13 +284,31 @@ public class CommandLineControllerImpl implements Runnable, Controller {
 
 
     /**
+     * Processes the 'file' command.
+     */
+    protected void processCmdFile( String[] args ) {
+        if (args.length == 1) println( "Too few parameters, type 'help'" );
+
+        for (int i=1; i < args.length; i++) {
+            try {
+                loadFile( new File( args[i] ));
+            }
+            catch (Exception e) {
+                // already handled
+            }
+        }
+    }
+
+
+    /**
      * Processes the 'help' command.
      */
     protected void processCmdHelp( String[] args ) {
         println( "Please enter a payment (CurrencyCode Value) or a command:" );
-        println( "    quit [delay_in_sec] - exits the app" );
-        println( "    report              - prints the report immediatelly" );
-        println( "    help                - prints this info" );
+        println( "    quit [delay_in_sec]  - exits the app" );
+        println( "    report               - prints the report immediatelly" );
+        println( "    file F1 [F2 [F3...]] - loads payments from file(s)" );
+        println( "    help                 - prints this info" );
     }
 
 

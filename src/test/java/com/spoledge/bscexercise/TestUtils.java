@@ -3,8 +3,8 @@ package com.spoledge.bscexercise;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Currency;
 
+import com.spoledge.bscexercise.model.Curr;
 import com.spoledge.bscexercise.model.Money;
 
 
@@ -28,7 +28,7 @@ public class TestUtils {
         return money( "USD", amount );
     }
 
-    public static Currency usd() {
+    public static Curr usd() {
         return curr( "USD" );
     }
 
@@ -41,7 +41,7 @@ public class TestUtils {
         return money( "EUR", amount );
     }
 
-    public static Currency eur() {
+    public static Curr eur() {
         return curr( "EUR" );
     }
 
@@ -51,8 +51,8 @@ public class TestUtils {
     }
 
 
-    public static Currency curr( String currencyCode ) {
-        return Currency.getInstance( currencyCode );
+    public static Curr curr( String currencyCode ) {
+        return Curr.getInstance( currencyCode );
     }
 
 

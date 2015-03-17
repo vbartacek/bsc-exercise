@@ -1,7 +1,6 @@
 package com.spoledge.bscexercise.model;
 
 import java.math.BigDecimal;
-import java.util.Currency;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
