@@ -41,6 +41,7 @@ public class CommandLineControllerImpl implements Runnable, Controller {
     private PaymentProcessor paymentProcessor;
     private PaymentReporter paymentReporter;
     private MoneyParser moneyParser;
+    private File directory;
 
     private BufferedReader reader;
     private PrintWriter writer;
@@ -214,6 +215,18 @@ public class CommandLineControllerImpl implements Runnable, Controller {
     }
 
 
+    public File getDirectory() {
+        return directory;
+    }
+
+    /**
+     * Sets the directory used for relative paths.
+     */
+    public void setDirectory( File directory ) {
+        this.directory = directory;
+    }
+
+
     ////////////////////////////////////////////////////////////////////////////
     // Protected
     ////////////////////////////////////////////////////////////////////////////
@@ -291,7 +304,7 @@ public class CommandLineControllerImpl implements Runnable, Controller {
 
         for (int i=1; i < args.length; i++) {
             try {
-                loadFile( new File( args[i] ));
+                loadFile( new File( directory, args[i] ));
             }
             catch (Exception e) {
                 // already handled
