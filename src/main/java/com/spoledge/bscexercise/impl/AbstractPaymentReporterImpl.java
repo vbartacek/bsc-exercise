@@ -206,7 +206,7 @@ public abstract class AbstractPaymentReporterImpl implements PaymentReporter {
     protected void scheduleTimerTask( Timer timer, long period,
                                         boolean syncSec, boolean syncMin, boolean syncHour ) {
 
-        Date date = syncStartDate( new Date(), syncSec, syncMin, syncHour );
+        Date date = syncStartDate( new Date(), period, syncSec, syncMin, syncHour );
 
         timer.scheduleAtFixedRate(
             new TimerTask() {
@@ -237,23 +237,29 @@ public abstract class AbstractPaymentReporterImpl implements PaymentReporter {
      * E.g. if the start is "14:41:23,456", then values "14:41:24,000", "14:42:00,000" and "15:00:00,000"
      * are synchronized with seconds, minutes and hours respectively.
      */
-    protected static Date syncStartDate( Date date, boolean syncSec, boolean syncMin, boolean syncHour ) {
+    protected static Date syncStartDate( Date date, long period, boolean syncSec, boolean syncMin, boolean syncHour ) {
         Calendar cal = Calendar.getInstance();
         cal.setTime( date );
+        cal.add( Calendar.MILLISECOND, (int)period );
 
-        if (syncSec) {
+        if (syncSec && period >= 1000) {
             int ms = cal.get( Calendar.MILLISECOND );
             if (ms != 0) cal.add( Calendar.MILLISECOND, 1000 - ms );
         }
 
-        if (syncMin) {
+        if (syncMin && period >= 60000) {
             int min = cal.get( Calendar.SECOND );
             if (min != 0) cal.add( Calendar.SECOND, 60 - min );
         }
 
-        if (syncHour) {
+        if (syncHour && period >= 3600000L) {
             int hour = cal.get( Calendar.MINUTE );
             if (hour != 0) cal.add( Calendar.MINUTE, 60 - hour );
+        }
+
+        // first interval can be shorter, but not longer than one period:
+        if (cal.getTimeInMillis() - date.getTime() > period) {
+            cal.add( Calendar.MILLISECOND, (int)-period );
         }
 
         return cal.getTime();

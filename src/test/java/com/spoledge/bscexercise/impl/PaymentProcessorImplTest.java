@@ -41,15 +41,21 @@ public class PaymentProcessorImplTest {
     public void testSyncStartDate() {
         Date date = new Date( dateTime( "2015-03-16 15:12:34" ).getTime() + 987 );
 
-        assertEquals( "0-0-0", date, AbstractPaymentReporterImpl.syncStartDate( date, false, false, false ));
+        assertEquals( "0-0-0", date,
+            AbstractPaymentReporterImpl.syncStartDate( date, 0, false, false, false ));
+
         assertEquals( "1-0-0", dateTime( "2015-03-16 15:12:35" ),
-            AbstractPaymentReporterImpl.syncStartDate( date, true, false, false ));
+            AbstractPaymentReporterImpl.syncStartDate( date, 60000, true, false, false ));
 
         assertEquals( "1-1-0", dateTime( "2015-03-16 15:13:00" ),
-            AbstractPaymentReporterImpl.syncStartDate( date, true, true, false ));
+            AbstractPaymentReporterImpl.syncStartDate( date, 60000, true, true, false ));
+
+        // shorter period than one hour:
+        assertEquals( "1-1-0", dateTime( "2015-03-16 15:13:00" ),
+            AbstractPaymentReporterImpl.syncStartDate( date, 60000, true, true, true ));
 
         assertEquals( "1-1-1", dateTime( "2015-03-16 16:00:00" ),
-            AbstractPaymentReporterImpl.syncStartDate( date, true, true, true ));
+            AbstractPaymentReporterImpl.syncStartDate( date, 3600000L, true, true, true ));
     }
 
 
