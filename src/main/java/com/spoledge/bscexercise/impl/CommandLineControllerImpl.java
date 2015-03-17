@@ -21,7 +21,7 @@ import com.spoledge.bscexercise.model.Money;
 /**
  * A command line implementation of the controller.
  */
-public class CommandLineController implements Runnable, Controller {
+public class CommandLineControllerImpl implements Runnable, Controller {
 
     /**
      * The number of milliseconds between calls to (reader.ready()).
@@ -54,7 +54,7 @@ public class CommandLineController implements Runnable, Controller {
     /**
      * Creates a new controller using standard in and out streams.
      */
-    public CommandLineController() {
+    public CommandLineControllerImpl() {
         this( null, null );
     }
 
@@ -64,7 +64,7 @@ public class CommandLineController implements Runnable, Controller {
      * @param reader an input reader, if null then the standard input is used
      * @param writer an output writer, if null then the standard output is used
      */
-    public CommandLineController( Reader reader, PrintWriter writer ) {
+    public CommandLineControllerImpl( Reader reader, PrintWriter writer ) {
         try {
             this.reader = reader != null ?
                             (reader instanceof BufferedReader) ?
@@ -209,7 +209,7 @@ public class CommandLineController implements Runnable, Controller {
             }
         }
         else {
-            println( "ERROR - unknown command, type 'help'" );
+            println( "ERROR - unknown command '" + line + "', type 'help'" );
         }
     }
 
