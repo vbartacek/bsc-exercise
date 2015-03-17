@@ -120,7 +120,7 @@ then just type 'report'.
 
 If you want to load a file or more containing the transactions
 (same functionality as loading the files on startup), the just type
-'file FILENAME'. You can specify more than one file at a moment.
+`file FILENAME`. You can specify more than one file at a moment.
 If you passed the `-D, --directory DIR` parameter on startup,
 then you can just specify a relative filepath now.
 
