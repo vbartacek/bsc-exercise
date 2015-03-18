@@ -46,6 +46,10 @@ public class TestUtils {
     }
 
 
+    public static Money money( String currencyCode, String amount ) {
+        return money( currencyCode, new BigDecimal( amount ));
+    }
+
     public static Money money( String currencyCode, BigDecimal amount ) {
         return new Money( curr( currencyCode ), amount );
     }

@@ -2,10 +2,12 @@ package com.spoledge.bscexercise.impl;
 
 import java.io.PrintWriter;
 
+import com.spoledge.bscexercise.CurrencyConverter;
 import com.spoledge.bscexercise.PaymentProcessor;
 import com.spoledge.bscexercise.PaymentReporter;
 
 import com.spoledge.bscexercise.model.Balance;
+import com.spoledge.bscexercise.model.Curr;
 import com.spoledge.bscexercise.model.Money;
 
 
@@ -23,6 +25,7 @@ public class SimplePaymentReporterImpl extends AbstractPaymentReporterImpl {
 
     private PrintWriter out;
     private PaymentProcessor paymentProcessor;
+    private CurrencyConverter currencyConverter;
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -56,6 +59,8 @@ public class SimplePaymentReporterImpl extends AbstractPaymentReporterImpl {
      */
     public void generatePaymentReport() {
         PaymentProcessor pp = this.paymentProcessor;
+        CurrencyConverter cc = this.currencyConverter;
+        Curr targetCurrency = cc != null ? cc.getTargetCurrency() : null;
 
         if (pp == null) {
             log.error( "PaymentProcessor not set, cannot obtain data." );
@@ -72,7 +77,19 @@ public class SimplePaymentReporterImpl extends AbstractPaymentReporterImpl {
 
         for (Money money : sortByCurrencyCode( balance.getAllMoney())) {
             if (!money.isZero()) {
-                sb.append( money ).append( NL );
+                sb.append( money );
+
+                if (cc != null && money.getCurrency() != targetCurrency) {
+                    Money converted = cc.convertMoney( money );
+                    sb.append( " (" );
+
+                    if (converted != null) sb.append( converted );
+                    else sb.append( targetCurrency ).append( " ???" );
+
+                    sb.append( ')' );
+                }
+
+                sb.append( NL );
             }
         }
 
@@ -100,6 +117,15 @@ public class SimplePaymentReporterImpl extends AbstractPaymentReporterImpl {
 
     public void setPaymentProcessor( PaymentProcessor paymentProcessor ) {
         this.paymentProcessor = paymentProcessor;
+    }
+
+
+    public CurrencyConverter getCurrencyConverter() {
+        return currencyConverter;
+    }
+
+    public void setCurrencyConverter( CurrencyConverter currencyConverter ) {
+        this.currencyConverter = currencyConverter;
     }
 
 }

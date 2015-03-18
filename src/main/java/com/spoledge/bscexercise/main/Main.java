@@ -3,6 +3,7 @@ package com.spoledge.bscexercise.main;
 import java.io.File;
 import java.io.PrintWriter;
 
+import com.spoledge.bscexercise.model.Curr;
 import com.spoledge.bscexercise.impl.*;
 
 
@@ -17,8 +18,10 @@ public class Main {
         boolean syncSec;
         boolean syncMin;
         boolean syncHour;
+        Curr targetCurr = Curr.getInstance( "USD" );
 
         File directory;
+        File forex;
         File[] files;
     }
 
@@ -45,6 +48,22 @@ public class Main {
         controller.setMoneyParser( moneyParser );
 
         if (opts.directory != null) controller.setDirectory( opts.directory );
+
+        if (opts.forex != null) {
+            FileCurrencyConverterImpl converter
+                = new FileCurrencyConverterImpl( opts.targetCurr, opts.decimalPoints );
+
+            reporter.setCurrencyConverter( converter );
+            controller.setCurrencyConverter( converter );
+
+            try {
+                converter.loadFile( opts.forex );
+            }
+            catch (Exception e) {
+                System.err.println( "Cannot read forex file: " + e );
+                return;
+            }
+        }
 
         printVersion( writer );
 
@@ -119,7 +138,15 @@ public class Main {
 
             String val = args[ i++ ];
 
-            if ("-d".equals( opt ) || "--decimal".equals( opt )) {
+            if ("-c".equals( opt ) || "--forex-currency".equals( opt )) {
+                try {
+                    ret.targetCurr = Curr.getInstance( val );
+                }
+                catch (Exception e) {
+                    return error( "Invalid target currency: " + e.getMessage());
+                }
+            }
+            else if ("-d".equals( opt ) || "--decimal".equals( opt )) {
                 try {
                     ret.decimalPoints = Integer.parseInt( val );
                 }
@@ -158,6 +185,13 @@ public class Main {
                         return error( "Unknown sync-period option value '" + val + "'" );
                 }
             }
+            else if ("-x".equals( opt ) || "--forex-file".equals( opt )) {
+                File file = ret.forex = new File( ret.directory, val );
+
+                if (!file.exists() || !file.canRead()) {
+                    return error("File '" + file.getAbsolutePath() + "' cannot be opened.");
+                }
+            }
             else return error("Unknown option '" + opt + "'");
         }
 
@@ -176,6 +210,7 @@ public class Main {
         System.err.println( "usage: java -jar bsc-example.jar [OPTIONS] [FILE1 [FILE2...]]" );
         System.err.println( "BSC-Example - payment tracker.\n");
         System.err.println( " OPTIONS:");
+        System.err.println( "  -c, --forex-currency CODE    target currency for conversions (default=USD)");
         System.err.println( "  -d, --decimal NUMBER         max number of decimal points (default=2)");
         System.err.println( "  -D, --directory DIR          parent directory used for relative paths (input)");
         System.err.println( "  -p, --period SECONDS         the reporting period, default is 60 seconds.");
@@ -183,6 +218,7 @@ public class Main {
         System.err.println( "  -?, --help                   prints this help and exits");
         System.err.println( "      --usage");
         System.err.println( "  -V, --version                prints the version and exits");
+        System.err.println( "  -x, --forex-file FILE        conversion rates file");
     }
 
 
