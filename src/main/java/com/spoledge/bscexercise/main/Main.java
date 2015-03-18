@@ -207,7 +207,7 @@ public class Main {
 
 
     private static void usage() {
-        System.err.println( "usage: java -jar bsc-example.jar [OPTIONS] [FILE1 [FILE2...]]" );
+        System.err.println( "usage: java -jar bsc-exercise-2.0.jar [OPTIONS] [FILE1 [FILE2...]]" );
         System.err.println( "BSC-Example - payment tracker.\n");
         System.err.println( " OPTIONS:");
         System.err.println( "  -c, --forex-currency CODE    target currency for conversions (default=USD)");

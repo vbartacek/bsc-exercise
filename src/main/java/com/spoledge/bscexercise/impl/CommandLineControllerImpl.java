@@ -312,8 +312,15 @@ public class CommandLineControllerImpl implements Runnable, Controller {
      * Processes the 'forex' command.
      */
     protected void processCmdForex( String[] args ) {
-        if (args.length < 3) println( "Too few parameters, type 'help'" );
-        if (args.length > 3) println( "Too many parameters, type 'help'" );
+        if (args.length < 3) {
+            println( "Too few parameters, type 'help'" );
+            return;
+        }
+
+        if (args.length > 3) {
+            println( "Too many parameters, type 'help'" );
+            return;
+        }
 
         // check format first:
         Money money = null;
