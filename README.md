@@ -21,7 +21,7 @@ An exercise
 ### Quick Start
 
 1. Change the directory to the distribution directory: `cd target/dist`
-2. Start the java executable: `java -jar bsc-exercise-1.0.jar`
+2. Start the java executable: `java -jar bsc-exercise-2.0.jar`
 
 
 ### Command line starting options
@@ -30,11 +30,12 @@ There are several extra options which can be passed to the application
 during the start. To see the usage / help message, then just do:
 
 ```
-$ java -jar bsc-exercise-1.0.jar -?
-usage: java -jar bsc-exercise-1.0.jar [OPTIONS] [FILE1 [FILE2...]]
+$ java -jar bsc-exercise-2.0.jar -?
+usage: java -jar bsc-exercise-2.0.jar [OPTIONS] [FILE1 [FILE2...]]
 BSC-Example - payment tracker.
 
  OPTIONS:
+  -c, --forex-currency CODE    target currency for conversions (default=USD)
   -d, --decimal NUMBER         max number of decimal points (default=2)
   -D, --directory DIR          parent directory used for relative paths (input)
   -p, --period SECONDS         the reporting period, default is 60 seconds.
@@ -42,13 +43,18 @@ BSC-Example - payment tracker.
   -?, --help                   prints this help and exits
       --usage
   -V, --version                prints the version and exits
+  -x, --forex-file FILE        conversion rates file
 ```
 
 So if you want to load a sample file (included in the repo as well) and be able
 to load the files from the samples directory also directly from the application,
 then start it as:
 
-`java -jar bsc-exercise-1.0.jar -D ../../src/test/samples example.txt`
+`java -jar bsc-exercise-2.0.jar -D ../../src/test/samples example.txt`
+
+And if you want to load also currency exchange rates:
+
+`java -jar bsc-exercise-2.0.jar -D ../../src/test/samples -x rates.txt example.txt`
 
 
 ### Runtime commands
@@ -59,7 +65,7 @@ message:
 ```
 =======================================================
 BSC Exercise
-Version 1.0
+Version 2.0
 =======================================================
 >> Hello! Type 'help' for help.
 
@@ -73,6 +79,7 @@ help
 >> Please enter a payment (CurrencyCode Value) or a command:
 >>     quit [delay_in_sec]  - exits the app
 >>     report               - prints the report immediatelly
+>>     forex CURR AMOUNT    - converts currency
 >>     file F1 [F2 [F3...]] - loads payments from file(s)
 >>     help                 - prints this info
 ```
@@ -112,7 +119,7 @@ period is one minute, then syncing minutes with the clock means that
 the report will be printed just after a system clock's minute is changed:
 
 ```
-java -jar bsc-exercise-1.0.jar -p 60 -S m
+java -jar bsc-exercise-2.0.jar -p 60 -S m
 ```
 
 If you do not want to wait for the next automatic report,
@@ -127,10 +134,10 @@ then you can just specify a relative filepath now.
 Example:
 
 ```
-$ java -jar bsc-exercise-1.0.jar -D ../../src/test/samples
+$ java -jar bsc-exercise-2.0.jar -D ../../src/test/samples
 =======================================================
 BSC Exercise
-Version 1.0
+Version 2.0
 =======================================================
 >> Hello! Type 'help' for help.
 
@@ -141,6 +148,25 @@ file example.txt decimals.txt wrong.txt
 >> File ../../src/test/samples/decimals.txt successfully loaded (5 lines).
 >> Loading file ../../src/test/samples/wrong.txt...
 >> ERROR Loading file ../../src/test/samples/wrong.txt, aborting: com.spoledge.bscexercise.MoneyParseException: Invalid currency code 'USSR' at line 4
+```
+
+Another command is `forex`. You can convert any currency as follows:
+
+```
+$ java -jar bsc-exercise-2.0.jar -D ../../src/test/samples -x rates.txt example.txt
+=======================================================
+BSC Exercise
+Version 2.0
+=======================================================
+>> Loading file ../../src/test/samples/example.txt...
+>> Hello! Type 'help' for help.
+>> File ../../src/test/samples/example.txt successfully loaded (5 lines).
+forex EUR 1
+>> Forex EUR 1.00 ==> USD 1.06
+forex JPY 100
+>> Forex JPY 100.00 ==> USD 0.82
+forex CZK 10
+>> No conversion rate for CZK set
 ```
 
 Finally if you want to quit (yes, CTRL-C should be working, but let
@@ -216,7 +242,7 @@ We found these differences which are basically supersets of the
 original requirements:
 
 * The application is able to load more than one file during the start
-* The application understand more commands than only the `quit`
+* The application understands more commands than only the `quit`
 
 
 ### Application Components

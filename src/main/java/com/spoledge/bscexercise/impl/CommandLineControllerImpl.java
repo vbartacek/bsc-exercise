@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.spoledge.bscexercise.Controller;
+import com.spoledge.bscexercise.CurrencyConverter;
 import com.spoledge.bscexercise.MoneyParseException;
 import com.spoledge.bscexercise.MoneyParser;
 import com.spoledge.bscexercise.PaymentProcessor;
@@ -40,6 +41,7 @@ public class CommandLineControllerImpl implements Runnable, Controller {
 
     private PaymentProcessor paymentProcessor;
     private PaymentReporter paymentReporter;
+    private CurrencyConverter currencyConverter;
     private MoneyParser moneyParser;
     private File directory;
 
@@ -159,7 +161,7 @@ public class CommandLineControllerImpl implements Runnable, Controller {
     /**
      * Loads a file.
      */
-    public void loadFile( File file ) throws IOException, MoneyParseException {
+    public void loadFile( File file ) {
         MoneyFile mf = new MoneyFile( moneyParser, file );
         println( "Loading file " + file + "..." );
         int count = 0;
@@ -206,6 +208,15 @@ public class CommandLineControllerImpl implements Runnable, Controller {
     }
 
 
+    public CurrencyConverter getCurrencyConverter() {
+        return currencyConverter;
+    }
+
+    public void setCurrencyConverter( CurrencyConverter currencyConverter ) {
+        this.currencyConverter = currencyConverter;
+    }
+
+
     public MoneyParser getMoneyParser() {
         return moneyParser;
     }
@@ -242,6 +253,7 @@ public class CommandLineControllerImpl implements Runnable, Controller {
 
         if ( "quit".equals( cmd )) processCmdQuit( args );
         else if ( "report".equals( cmd )) processCmdReport( args );
+        else if ( "forex".equals( cmd )) processCmdForex( args );
         else if ( "file".equals( cmd )) processCmdFile( args );
         else if ( "help".equals( cmd )) processCmdHelp( args );
         else if ( args.length == 2 ) {
@@ -297,6 +309,49 @@ public class CommandLineControllerImpl implements Runnable, Controller {
 
 
     /**
+     * Processes the 'forex' command.
+     */
+    protected void processCmdForex( String[] args ) {
+        if (args.length < 3) {
+            println( "Too few parameters, type 'help'" );
+            return;
+        }
+
+        if (args.length > 3) {
+            println( "Too many parameters, type 'help'" );
+            return;
+        }
+
+        // check format first:
+        Money money = null;
+
+        try {
+            money = moneyParser.parseMoney( args[ 1 ], args[ 2 ] );
+        }
+        catch (MoneyParseException e) {
+            println( "ERROR - invalid forex format: " + e.getMessage());
+            return;
+        }
+
+        CurrencyConverter cc = currencyConverter;
+
+        if (cc == null) {
+            println( "No exchange rates loaded." );
+            return;
+        }
+
+        Money converted = cc.convertMoney( money );
+
+        if (converted != null) {
+            println( "Forex " + money + " ==> " + converted );
+        }
+        else {
+            println( "No conversion rate for " + money.getCurrency() + " set" );
+        }
+    }
+
+
+    /**
      * Processes the 'file' command.
      */
     protected void processCmdFile( String[] args ) {
@@ -320,6 +375,7 @@ public class CommandLineControllerImpl implements Runnable, Controller {
         println( "Please enter a payment (CurrencyCode Value) or a command:" );
         println( "    quit [delay_in_sec]  - exits the app" );
         println( "    report               - prints the report immediatelly" );
+        println( "    forex CURR AMOUNT    - converts currency" );
         println( "    file F1 [F2 [F3...]] - loads payments from file(s)" );
         println( "    help                 - prints this info" );
     }
